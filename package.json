@@ -1,0 +1,40 @@
+{
+  "name": "copilot-profiles",
+  "displayName": "Copilot Profiles",
+  "description": "Manage Copilot instructions easily through Profiles.",
+  "version": "0.1.0",
+  "publisher": "your-publisher-id",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "main": "./out/extension.js",
+  "categories": ["Other"],
+  "activationEvents": [
+    "onView:copilotProfilesView"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "copilot-profiles-sidebar",
+          "title": "Copilot Profiles",
+          "icon": "media/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "copilot-profiles-sidebar": [
+        {
+          "id": "copilot-profiles-view",
+          "name": "",
+          "type": "webview"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  }
+}

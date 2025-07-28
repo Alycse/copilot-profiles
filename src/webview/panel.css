@@ -1,0 +1,164 @@
+:root {
+  color-scheme: dark light;
+  --cim-bg: var(--vscode-sideBar-background);
+  --cim-fg: var(--vscode-sideBar-foreground);
+  --cim-btn-bg: var(--vscode-button-background);
+  --cim-btn-fg: var(--vscode-button-foreground);
+  --cim-btn-hover: var(--vscode-button-hoverBackground);
+  --cim-border: var(--vscode-sideBar-border, #bbb);
+  --cim-scroll-bg: var(--vscode-editor-background);
+  --cim-scroll-fg: var(--vscode-editor-foreground);
+  --cim-info: var(--vscode-descriptionForeground, #555);
+  --cim-hint: var(--vscode-textLink-foreground, #218c5a);
+  --cim-folder: var(--vscode-descriptionForeground, #444);
+  --cim-green: #145a32;
+  --cim-green-hover: #117a37;
+  --cim-red: #7b241c;
+  --cim-red-hover: #922b21;
+}
+body {
+  background-color: var(--cim-bg);
+  color: var(--cim-fg);
+  font-family: var(--vscode-font-family, sans-serif);
+  padding: 12px;
+}
+.btn, button {
+  background: var(--cim-btn-bg);
+  color: var(--cim-btn-fg);
+  border: none;
+  border-radius: 4px;
+  padding: 7px 13px;
+  margin: 2px 0;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: background .12s, color .12s, opacity .12s;
+}
+.btn:disabled, button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  filter: grayscale(0.4);
+  background: var(--cim-btn-bg) !important;
+  color: var(--cim-btn-fg) !important;
+}
+.btn:hover:enabled, button:hover:enabled {
+  background: var(--cim-btn-hover);
+}
+.btn-green {
+  background: var(--cim-green) !important;
+  color: #fff !important;
+}
+.btn-green:enabled:hover {
+  background: var(--cim-green-hover) !important;
+}
+.btn-green:disabled {
+  background: var(--cim-green) !important;
+  color: #fff !important;
+}
+.btn-red {
+  background: var(--cim-red) !important;
+  color: #fff !important;
+}
+.btn-red:enabled:hover {
+  background: var(--cim-red-hover) !important;
+}
+.btn-red:disabled {
+  background: var(--cim-red) !important;
+  color: #fff !important;
+}
+.btn-square {
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  padding: 0;
+  margin: 0 4px 0 0;
+  font-size: 1.35em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace, 'Courier New', Courier, sans-serif;
+}
+.btn-square:last-child {
+  margin-right: 0;
+}
+select {
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, #bbb);
+  border-radius: 4px;
+  padding: 7px;
+  margin-bottom: 12px;
+  width: 100%;
+  font-size: 1em;
+}
+.section-title {
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 0.6em;
+  margin-bottom: 0.25em;
+}
+.info {
+  font-size: 0.9em;
+  color: var(--cim-info);
+  margin-bottom: 0.4em;
+}
+.hint {
+  color: var(--cim-hint);
+  margin-bottom: 1em;
+  font-size: 0.93em;
+  border: 1.5px solid var(--cim-border);
+  border-radius: 6px;
+  background: transparent;
+  padding: 8px 12px;
+  text-align: center;
+  display: block;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 98%;
+}
+.folder-path {
+  font-size: 0.95em;
+  word-break: break-all;
+  margin-bottom: 1em;
+  color: var(--cim-folder);
+  border: 1.5px solid var(--cim-border);
+  border-radius: 6px;
+  background: transparent;
+  padding: 8px 12px;
+  text-align: center;
+  display: block;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 98%;
+}
+hr { border: 0; border-top: 1px solid var(--cim-border); margin: 1em 0; }
+.scroll-list {
+  max-height: 160px;
+  min-height: 160px;
+  height: 160px;
+  overflow-y: auto;
+  background: var(--cim-scroll-bg);
+  border: 1px solid var(--cim-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 1em;
+  font-size: 0.95em;
+  color: var(--cim-scroll-fg);
+  box-sizing: border-box;
+}
+.scroll-list .file-item {
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #3333;
+}
+.scroll-list .file-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
