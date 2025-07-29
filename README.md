@@ -28,3 +28,7 @@ Your selected source folder, sets, and files are saved automatically so everythi
 
 ### Sample Set Generator
 Quickly generate a sample Source Folder with example sets and files to see how everything works out of the box.
+
+## Demo
+
+https://github.com/user-attachments/assets/b738a327-e2dd-4684-bb8c-cc3dff0e86cf
