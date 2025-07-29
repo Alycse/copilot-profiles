@@ -1,5 +1,39 @@
+# Node
 node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build artifacts
 out/
-sample_sets/
+dist/
 *.vsix
-*package-lock.json
+*.tsbuildinfo
+out/**/*.map
+
+# VS Code workspace cruft
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Tests/coverage
+coverage/
+.nyc_output/
+reports/
+junit.xml
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+
+# Env/secrets
+.env
+.env.*
+!.env.example
+
+# Local samples
+sample_sets/

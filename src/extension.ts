@@ -50,6 +50,10 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     view.webview.onDidReceiveMessage((m: WebviewCommand) => this.routeMessage(m));
   }
 
+  private showNotification(message: string) {
+    vscode.window.showInformationMessage(message);
+  }
+
   private routeMessage(message: WebviewCommand) {
     const map: Record<string, (m: any) => void | Promise<void>> = {
       browseSourceFolder: () => this.pickSourceFolder(),
@@ -60,6 +64,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       openInstructionFile: (m) => this.openInstructionFile(m.setName, m.fileName),
       saveCheckedState: (m) => this.saveCheckedState(m.state),
       openSourceFolder: (m) => this.openSourceFolder(m.folderPath),
+      showNotification: (m) => this.showNotification(m.message),
     };
     const handler = map[message.command];
     if (handler) handler(message);
@@ -241,17 +246,17 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
 
   private async injectSelections(selections: { setName: string; files: string[] }[]) {
     if (!this.sourcePath) {
-      vscode.window.showErrorMessage('No source folder selected.');
+      this.showNotification('No source folder selected.');
       return;
     }
     const out = this.outputFilePath();
     if (!out) {
-      vscode.window.showErrorMessage('No workspace open.');
+      this.showNotification('No workspace open.');
       return;
     }
     const { content, injectedSets } = this.buildCombinedInstructions(selections);
     if (!content) {
-      vscode.window.showErrorMessage('No instruction files selected for injection.');
+      this.showNotification('No instruction files selected for injection.');
       return;
     }
     fs.writeFileSync(out, content, 'utf8');
@@ -265,7 +270,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     }
     const doc = await vscode.workspace.openTextDocument(out);
     await vscode.window.showTextDocument(doc, { preview: false });
-    vscode.window.showInformationMessage(`copilot-instructions.md updated from: ${injectedSets.join(', ')}`);
+    this.showNotification(`copilot-instructions.md updated from: ${injectedSets.join(', ')}`);
   }
 
   private postInstructionFiles(setName: string) {
@@ -287,7 +292,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     const pick = await vscode.window.showOpenDialog({
       canSelectFolders: true,
       canSelectFiles: false,
-      openLabel: 'Select Location to Create Source',
+      openLabel: 'Select Location to Create Sample Source',
     });
     if (!pick || !pick.length) return;
     const base = pick[0].fsPath;
@@ -306,10 +311,10 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       this.persistSourceFolder(sample);
       this.clearCheckedState();
       this.postSets();
-      vscode.window.showInformationMessage(`Sample source folder created at: ${sample}`);
+      this.showNotification(`Sample source folder created at: ${sample}`);
       vscode.env.openExternal(vscode.Uri.file(sample));
     } catch {
-      vscode.window.showErrorMessage('Failed to create sample source folder.');
+      this.showNotification('Failed to create sample source folder.');
     }
   }
 

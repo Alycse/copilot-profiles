@@ -1,0 +1,1 @@
+This file contains global standards that apply to all development work.

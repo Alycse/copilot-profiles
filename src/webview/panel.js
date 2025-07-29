@@ -177,6 +177,13 @@ function renderPage() {
   document.getElementById('prevPageBtn').disabled = state.currentPage === 0;
   document.getElementById('nextPageBtn').disabled = state.currentPage === state.pages.length - 1;
   document.getElementById('pageIndicator').textContent = `Page ${state.currentPage + 1} of ${state.pages.length}`;
+  const sourceFolderElement = document.getElementById('sourceFolder');
+  if (hasFolder) {
+    sourceFolderElement.textContent = state.sourcePath;
+    sourceFolderElement.style.display = 'block';
+  } else {
+    sourceFolderElement.style.display = 'none';
+  }
   if (page.set) {
     vscode.postMessage({ command: 'getInstructionFiles', setName: page.set });
   } else {
@@ -222,6 +229,9 @@ window.addEventListener('message', (event) => {
     updateLastInjected(lastInjectedSet);
     const createBtn = document.getElementById('createSampleBtn');
     createBtn.style.display = isNotSet ? 'block' : 'none';
+    if (isNotSet) {
+      vscode.postMessage({ command: 'showNotification', message: 'No valid Sets found in this Source location.' });
+    }
   }
   if (command === 'instructionFiles') applyInstructionFiles(instructionFiles);
   if (command === 'lastInjectedSetUpdate') updateLastInjected(lastInjectedSet);
