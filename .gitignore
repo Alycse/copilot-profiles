@@ -1,4 +1,5 @@
 node_modules/
 out/
+sample_sets/
 *.vsix
 *package-lock.json
