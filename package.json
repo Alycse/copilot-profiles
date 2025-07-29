@@ -1,9 +1,9 @@
 {
   "name": "copilot-profiles",
   "displayName": "Copilot Profiles",
-  "icon": "media/icon.png",
+  "icon": "media/logo.png",
   "description": "Manage and switch Copilot instructions easily using profiles.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "alycse",
   "engines": {
     "vscode": "^1.102.0"
