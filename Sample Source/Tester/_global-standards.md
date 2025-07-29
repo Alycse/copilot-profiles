@@ -1,1 +1,0 @@
-This file contains global standards that apply to all testing work.

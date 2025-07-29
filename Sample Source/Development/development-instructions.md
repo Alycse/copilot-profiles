@@ -1,1 +1,0 @@
-This file contains specific instructions for development tasks.

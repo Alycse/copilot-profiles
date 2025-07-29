@@ -42,7 +42,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "@types/vscode": "^1.102.0"
+    "@types/vscode": "^1.102.0",
+    "typescript": "^5.8.3"
   },
   "repository": {
     "type": "git",
