@@ -48,6 +48,9 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       case 'browseSourceFolder':
         await this.browseSourceFolder();
         break;
+      case 'createSampleSource':
+        await this.createSampleSource();
+        break;
       case 'getSets':
         this.sendSets();
         break;
@@ -174,7 +177,76 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     if (folders && folders.length) {
       sourcePath = folders[0].fsPath;
       this.saveSourceFolder(sourcePath);
+      const githubDir = this.getGithubDir();
+      if (githubDir) {
+        const checkedStatePath = path.join(githubDir, 'copilot-profiles-checked-state.json');
+        try {
+          if (fs.existsSync(checkedStatePath)) {
+            fs.unlinkSync(checkedStatePath);
+          }
+        } catch {}
+      }
       this.sendSets();
+    }
+  }
+
+  private async createSampleSource() {
+    const folders = await vscode.window.showOpenDialog({
+      canSelectFolders: true,
+      canSelectFiles: false,
+      openLabel: 'Select Location to Create Sample Source'
+    });
+    if (folders && folders.length) {
+      const selectedLocation = folders[0].fsPath;
+      const sampleSourcePath = path.join(selectedLocation, 'Sample Source');
+      
+      try {
+        // Create the main Sample Source folder
+        if (!fs.existsSync(sampleSourcePath)) {
+          fs.mkdirSync(sampleSourcePath, { recursive: true });
+        }
+        
+        // Create Development folder and files
+        const developmentPath = path.join(sampleSourcePath, 'Development');
+        fs.mkdirSync(developmentPath, { recursive: true });
+        
+        const globalStandardsDevContent = 'This file contains global standards that apply to all development work.';
+        const developmentInstructionsContent = 'This file contains specific instructions for development tasks.';
+        
+        fs.writeFileSync(path.join(developmentPath, 'global-standards.md'), globalStandardsDevContent, 'utf8');
+        fs.writeFileSync(path.join(developmentPath, 'development-instructions.md'), developmentInstructionsContent, 'utf8');
+        
+        // Create Tester folder and files
+        const testerPath = path.join(sampleSourcePath, 'Tester');
+        fs.mkdirSync(testerPath, { recursive: true });
+        
+        const globalStandardsTesterContent = 'This file contains global standards that apply to all testing work.';
+        const testerInstructionsContent = 'This file contains specific instructions for testing tasks.';
+        
+        fs.writeFileSync(path.join(testerPath, 'global-standards.md'), globalStandardsTesterContent, 'utf8');
+        fs.writeFileSync(path.join(testerPath, 'tester-instructions.md'), testerInstructionsContent, 'utf8');
+        
+        // Set the created folder as the source path
+        sourcePath = sampleSourcePath;
+        this.saveSourceFolder(sourcePath);
+        
+        // Clear any existing checked state
+        const githubDir = this.getGithubDir();
+        if (githubDir) {
+          const checkedStatePath = path.join(githubDir, 'copilot-profiles-checked-state.json');
+          try {
+            if (fs.existsSync(checkedStatePath)) {
+              fs.unlinkSync(checkedStatePath);
+            }
+          } catch {}
+        }
+        
+        this.sendSets();
+        vscode.window.showInformationMessage(`Sample source folder created at: ${sampleSourcePath}`);
+        
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to create sample source folder: ${error}`);
+      }
     }
   }
 

@@ -89,10 +89,14 @@ function handleBrowseBtnClick() {
   vscode.postMessage({ command: 'browseSourceFolder' });
 }
 
+function handleCreateSampleBtnClick() {
+  vscode.postMessage({ command: 'createSampleSource' });
+}
+
 function setInstructionFiles(files) {
   pages[currentPage].instructionFiles = files || [];
   const allFiles = files || [];
-  if (typeof pages[currentPage].checkedFiles === 'undefined') {
+  if (!pages[currentPage].checkedFiles || pages[currentPage].checkedFiles.length === 0) {
     pages[currentPage].checkedFiles = [...allFiles];
   } else {
     pages[currentPage].checkedFiles = pages[currentPage].checkedFiles.filter(f => allFiles.includes(f));
@@ -155,7 +159,7 @@ function renderPage() {
   if (!pages[currentPage].set && setsList.length) {
     pages[currentPage].set = setsList[0];
   }
-  dropdown.value = pages[currentPage].set || (setsList[0] || '');
+  dropdown.value = pages[currentPage].set || '';
   const hasSourceFolder = sourceFolderPath && sourceFolderPath.trim() !== '' && sourceFolderPath !== 'Not set';
   dropdown.disabled = !hasSourceFolder;
   document.getElementById('injectBtn').disabled = !hasSourceFolder || !pages[currentPage].set;
@@ -178,6 +182,7 @@ function handleSourceFolderClick(e) {
 
 window.onload = () => {
   document.getElementById('browseBtn').onclick = handleBrowseBtnClick;
+  document.getElementById('createSampleBtn').onclick = handleCreateSampleBtnClick;
   document.getElementById('setDropdown').onchange = handleSetDropdownChange;
   document.getElementById('injectBtn').onclick = handleInjectBtnClick;
   document.getElementById('prevPageBtn').onclick = handlePrevPageClick;
@@ -196,14 +201,23 @@ window.addEventListener('message', event => {
     if (savedCheckedState) {
       restoreFullState(savedCheckedState);
     } else {
-      pages.forEach(p => {
-        if (!p.set && setsList.length) p.set = setsList[0];
-      });
+      pages = [{ set: '', checkedFiles: [], instructionFiles: [] }];
       currentPage = 0;
+      if (setsList.length > 0) {
+        pages[0].set = setsList[0];
+      }
     }
     renderPage();
     document.getElementById('sourceFolder').textContent = sourceFolderPath || 'Not set';
     updateLastInjectedSet(lastInjectedSet);
+    
+    // Show/hide the create sample button based on whether source folder is set
+    const createSampleBtn = document.getElementById('createSampleBtn');
+    if (sourceFolderPath && sourceFolderPath.trim() !== '' && sourceFolderPath !== 'Not set') {
+      createSampleBtn.style.display = 'none';
+    } else {
+      createSampleBtn.style.display = 'block';
+    }
   } else if (command === 'instructionFiles') {
     setInstructionFiles(instructionFiles);
   } else if (command === 'lastInjectedSetUpdate') {
