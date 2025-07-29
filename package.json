@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "publisher": "alycse",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.102.0"
   },
   "main": "./out/extension.js",
   "categories": [
@@ -42,5 +42,9 @@
   "devDependencies": {
     "@types/node": "^24.1.0",
     "@types/vscode": "^1.102.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alycse/copilot-profiles"
   }
 }
