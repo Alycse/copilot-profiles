@@ -8,7 +8,9 @@
     "vscode": "^1.70.0"
   },
   "main": "./out/extension.js",
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
     "onView:copilotProfilesView"
   ],
@@ -36,5 +38,9 @@
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/vscode": "^1.102.0"
   }
 }

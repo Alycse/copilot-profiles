@@ -30,8 +30,12 @@ function saveFullState() {
 function handleSetDropdownChange(e) {
   pages[currentPage].set = e.target.value;
   pages[currentPage].checkedFiles = undefined;
-  document.getElementById('injectBtn').disabled = !pages[currentPage].set;
+  
+  const hasSourceFolder = sourceFolderPath && sourceFolderPath.trim() !== '' && sourceFolderPath !== 'Not set';
+  document.getElementById('injectBtn').disabled = !hasSourceFolder || !pages[currentPage].set;
+  
   saveFullState();
+
   if (pages[currentPage].set) {
     vscode.postMessage({ command: 'getInstructionFiles', setName: pages[currentPage].set });
   } else {
@@ -152,7 +156,9 @@ function renderPage() {
     pages[currentPage].set = setsList[0];
   }
   dropdown.value = pages[currentPage].set || (setsList[0] || '');
-  document.getElementById('injectBtn').disabled = !pages[currentPage].set;
+  const hasSourceFolder = sourceFolderPath && sourceFolderPath.trim() !== '' && sourceFolderPath !== 'Not set';
+  dropdown.disabled = !hasSourceFolder;
+  document.getElementById('injectBtn').disabled = !hasSourceFolder || !pages[currentPage].set;
   document.getElementById('removeSetBtn').disabled = pages.length <= 1;
   document.getElementById('prevPageBtn').disabled = currentPage === 0;
   document.getElementById('nextPageBtn').disabled = currentPage === pages.length - 1;

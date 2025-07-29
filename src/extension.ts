@@ -194,7 +194,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
   private getLastInjectedSet(): string {
     const root = this.getWorkspaceRoot();
     if (!root) return 'None';
-    const saveFilePath = path.join(root, '.github', 'copilot-profiles-state.json');
+    const saveFilePath = path.join(root, '.github', 'copilot-profiles-general-state.json');
     try {
       if (fs.existsSync(saveFilePath)) {
         const saveData = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
@@ -210,7 +210,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
   private getLastInjectedSetName(): string {
     const root = this.getWorkspaceRoot();
     if (!root) return '';
-    const saveFilePath = path.join(root, '.github', 'copilot-profiles-state.json');
+    const saveFilePath = path.join(root, '.github', 'copilot-profiles-general-state.json');
     try {
       if (fs.existsSync(saveFilePath)) {
         const saveData = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
@@ -223,7 +223,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
   private saveSourceFolder(sourcePath: string) {
     const githubDir = this.getGithubDir();
     if (!githubDir) return;
-    const saveFilePath = path.join(githubDir, 'copilot-profiles-state.json');
+    const saveFilePath = path.join(githubDir, 'copilot-profiles-general-state.json');
     let saveData: any = {
       lastInjectedSet: 'None',
       lastInjectedSetName: '',
@@ -238,14 +238,14 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       saveData.lastSourceFolder = sourcePath;
       saveData.lastUpdated = new Date().toISOString();
       fs.writeFileSync(saveFilePath, JSON.stringify(saveData, null, 2), 'utf8');
-      this.addToGitignore('.github/copilot-profiles-state.json');
+      this.addToGitignore('.github/copilot-profiles-general-state.json');
     } catch {}
   }
 
   private saveLastInjectedSet(setName: string, timestamp: string) {
     const githubDir = this.getGithubDir();
     if (!githubDir) return;
-    const saveFilePath = path.join(githubDir, 'copilot-profiles-state.json');
+    const saveFilePath = path.join(githubDir, 'copilot-profiles-general-state.json');
     const saveData = {
       lastInjectedSet: `${setName} (${timestamp})`,
       lastInjectedSetName: setName,
@@ -255,7 +255,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     };
     try {
       fs.writeFileSync(saveFilePath, JSON.stringify(saveData, null, 2), 'utf8');
-      this.addToGitignore('.github/copilot-profiles-state.json');
+      this.addToGitignore('.github/copilot-profiles-general-state.json');
     } catch {}
   }
 
