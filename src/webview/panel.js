@@ -87,7 +87,9 @@ function removeSet() {
   persistState();
 }
 
+let justBrowsedSource = false;
 function browseSource() {
+  justBrowsedSource = true;
   vscode.postMessage({ command: 'browseSourceFolder' });
 }
 
@@ -229,8 +231,9 @@ window.addEventListener('message', (event) => {
     updateLastInjected(lastInjectedSet);
     const createBtn = document.getElementById('createSampleBtn');
     createBtn.style.display = isNotSet ? 'block' : 'none';
-    if (isNotSet) {
+    if (isNotSet && justBrowsedSource) {
       vscode.postMessage({ command: 'showNotification', message: 'No valid Sets found in this Source location.' });
+      justBrowsedSource = false;
     }
   }
   if (command === 'instructionFiles') applyInstructionFiles(instructionFiles);

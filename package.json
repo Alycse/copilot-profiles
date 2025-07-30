@@ -3,7 +3,7 @@
   "displayName": "Copilot Profiles",
   "icon": "media/logo.png",
   "description": "Manage and switch Copilot instructions easily using profiles.",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "publisher": "alycse",
   "engines": {
     "vscode": "^1.102.0"
@@ -48,5 +48,24 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Alycse/copilot-profiles"
-  }
+  },
+  "keywords": [
+    "copilot",
+    "profiles",
+    "instructions",
+    "github",
+    "ai",
+    "prompt",
+    "management",
+    "switch",
+    "markdown",
+    "automation",
+    "sidebar",
+    "extension",
+    "productivity",
+    "workspace",
+    "sets",
+    "vscode",
+    "assistant"
+  ]
 }
