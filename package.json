@@ -3,13 +3,17 @@
   "displayName": "Copilot Profiles",
   "icon": "media/logo.png",
   "description": "Manage and switch Copilot instructions easily using profiles.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "alycse",
   "engines": {
     "vscode": "^1.102.0"
   },
   "main": "./out/extension.js",
   "categories": [
+    "AI",
+    "Machine Learning",
+    "Chat",
+    "Data Science",
     "Other"
   ],
   "activationEvents": [
