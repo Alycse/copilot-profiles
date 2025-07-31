@@ -1,4 +1,4 @@
-# Copilot Profiles
+# Copilot Profiles - A Modular Instruction Manager
 
 ### Easily manage modular GitHub Copilot instruction sets inside Visual Studio Code.
 
