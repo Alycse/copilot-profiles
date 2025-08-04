@@ -1,8 +1,8 @@
 {
   "name": "copilot-profiles",
-  "displayName": "Copilot Profiles",
+  "displayName": "Modular Copilot Profiles",
   "icon": "media/logo.png",
-  "description": "Manage and switch Copilot instructions easily using profiles.",
+  "description": "Easily manage and switch GitHub Copilot instructions using modular profiles.",
   "version": "0.2.3",
   "publisher": "alycse",
   "engines": {
@@ -24,7 +24,7 @@
       "activitybar": [
         {
           "id": "copilot-profiles-sidebar",
-          "title": "Copilot Profiles",
+          "title": "Modular Copilot Profiles",
           "icon": "media/icon.png"
         }
       ]
