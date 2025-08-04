@@ -13,14 +13,14 @@
     <div class="folder-path" id="sourceFolder" tabindex="0" style="cursor:pointer;"></div>
     <hr>
     <div id="pageIndicator" class="info" style="font-weight:bold; margin-bottom:0.5em;"></div>
-    <div class="section-title">Choose Set</div>
-    <select id="setDropdown"></select>
-    <div class="section-title">Instruction Files in Set</div>
+    <div class="section-title">Choose Profile</div>
+    <select id="profileDropdown"></select>
+    <div class="section-title">Instruction Files in Profile</div>
     <div id="instructionFileList" class="scroll-list"></div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; gap: 0;">
       <div style="display: flex; gap: 6px;">
-        <button class="btn btn-green btn-square" id="addSetBtn" title="Add New Set">+</button>
-        <button class="btn btn-red btn-square" id="removeSetBtn" title="Remove Set">-</button>
+        <button class="btn btn-green btn-square" id="addProfileBtn" title="Add New Profile">+</button>
+        <button class="btn btn-red btn-square" id="removeProfileBtn" title="Remove Profile">-</button>
       </div>
       <div style="display: flex; gap: 6px;">
         <button class="btn btn-square" id="prevPageBtn" title="Previous Page">&lt;&lt;</button>
@@ -28,11 +28,11 @@
       </div>
     </div>
     <hr>
-    <div class="section-title">Last Injected Set</div>
-    <div class="folder-path" id="lastInjectedSet">None</div>
+    <div class="section-title">Last Injected Profile</div>
+    <div class="folder-path" id="lastInjectedProfile">None</div>
     <hr>
     <button class="btn" id="injectBtn" disabled>Inject</button>
-    <div class="hint">All .md instructions in the chosen set will be combined into <b>.github/copilot-instructions.md</b> in your workspace.</div>
+    <div class="hint">All .md instructions in the chosen profile will be combined into <b>.github/copilot-instructions.md</b> in your workspace.</div>
   </div>
   <script src="{{SCRIPT_URI}}"></script>
 </body>

@@ -9,16 +9,16 @@ const OUTPUT_FILE = 'copilot-instructions.md';
 type WebviewCommand =
   | { command: 'browseSourceFolder' }
   | { command: 'createSampleSource' }
-  | { command: 'getSets' }
-  | { command: 'injectSets'; selections: { setName: string; files: string[] }[] }
-  | { command: 'getInstructionFiles'; setName: string }
-  | { command: 'openInstructionFile'; setName: string; fileName: string }
+  | { command: 'getProfiles' }
+  | { command: 'injectProfiles'; selections: { profileName: string; files: string[] }[] }
+  | { command: 'getInstructionFiles'; profileName: string }
+  | { command: 'openInstructionFile'; profileName: string; fileName: string }
   | { command: 'saveCheckedState'; state: any }
   | { command: 'openSourceFolder'; folderPath: string };
 
 type GeneralState = {
-  lastInjectedSet: string;
-  lastInjectedSetName: string;
+  lastInjectedProfile: string;
+  lastInjectedProfileName: string;
   lastInjectedTimestamp: string;
   lastSourceFolder: string;
   lastUpdated: string;
@@ -58,10 +58,10 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     const map: Record<string, (m: any) => void | Promise<void>> = {
       browseSourceFolder: () => this.pickSourceFolder(),
       createSampleSource: () => this.createSampleSource(),
-      getSets: () => this.postSets(),
-      injectSets: (m) => this.injectSelections(m.selections),
-      getInstructionFiles: (m) => this.postInstructionFiles(m.setName),
-      openInstructionFile: (m) => this.openInstructionFile(m.setName, m.fileName),
+      getProfiles: () => this.postProfiles(),
+      injectProfiles: (m) => this.injectSelections(m.selections),
+      getInstructionFiles: (m) => this.postInstructionFiles(m.profileName),
+      openInstructionFile: (m) => this.openInstructionFile(m.profileName, m.fileName),
       saveCheckedState: (m) => this.saveCheckedState(m.state),
       openSourceFolder: (m) => this.openSourceFolder(m.folderPath),
       showNotification: (m) => this.showNotification(m.message),
@@ -174,8 +174,8 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     const now = new Date().toISOString();
     const current: GeneralState =
       this.readJson<GeneralState>(p) ?? {
-        lastInjectedSet: 'None',
-        lastInjectedSetName: '',
+        lastInjectedProfile: 'None',
+        lastInjectedProfileName: '',
         lastInjectedTimestamp: '',
         lastSourceFolder: '',
         lastUpdated: now,
@@ -186,13 +186,13 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     this.addToGitignore(`.github/${GENERAL_STATE_FILE}`);
   }
 
-  private recordInjection(setName: string) {
+  private recordInjection(profileName: string) {
     const p = this.generalStatePath();
     if (!p) return;
     const now = new Date().toLocaleString();
     const data: GeneralState = {
-      lastInjectedSet: `${setName} (${now})`,
-      lastInjectedSetName: setName,
+      lastInjectedProfile: `${profileName} (${now})`,
+      lastInjectedProfileName: profileName,
       lastInjectedTimestamp: now,
       lastSourceFolder: this.sourcePath || '',
       lastUpdated: new Date().toISOString(),
@@ -201,7 +201,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     this.addToGitignore(`.github/${GENERAL_STATE_FILE}`);
   }
 
-  private listSets(): string[] {
+  private listProfiles(): string[] {
     if (!this.sourcePath || !fs.existsSync(this.sourcePath)) return [];
     return fs
       .readdirSync(this.sourcePath)
@@ -214,37 +214,37 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       .sort();
   }
 
-  private mdFilesInSet(setName: string): string[] {
+  private mdFilesInProfile(profileName: string): string[] {
     if (!this.sourcePath) return [];
-    const setDir = path.join(this.sourcePath, setName);
-    if (!fs.existsSync(setDir) || !fs.statSync(setDir).isDirectory()) return [];
+    const profileDir = path.join(this.sourcePath, profileName);
+    if (!fs.existsSync(profileDir) || !fs.statSync(profileDir).isDirectory()) return [];
     return fs
-      .readdirSync(setDir)
+      .readdirSync(profileDir)
       .filter((f) => f.endsWith('.md'))
       .sort();
   }
 
-  private buildCombinedInstructions(selections: { setName: string; files: string[] }[]): { content: string; injectedSets: string[] } {
+  private buildCombinedInstructions(selections: { profileName: string; files: string[] }[]): { content: string; injectedProfiles: string[] } {
     let content = '';
-    const injectedSets: string[] = [];
-    if (!this.sourcePath) return { content, injectedSets };
+    const injectedProfiles: string[] = [];
+    if (!this.sourcePath) return { content, injectedProfiles };
     for (const sel of selections) {
-      const setDir = path.join(this.sourcePath, sel.setName);
-      if (!fs.existsSync(setDir)) continue;
-      let files = this.mdFilesInSet(sel.setName);
+      const profileDir = path.join(this.sourcePath, sel.profileName);
+      if (!fs.existsSync(profileDir)) continue;
+      let files = this.mdFilesInProfile(sel.profileName);
       if (Array.isArray(sel.files) && sel.files.length) files = files.filter((f) => sel.files.includes(f));
       if (!files.length) continue;
-      injectedSets.push(sel.setName);
+      injectedProfiles.push(sel.profileName);
       for (const f of files) {
-        const text = fs.readFileSync(path.join(setDir, f), 'utf8');
+        const text = fs.readFileSync(path.join(profileDir, f), 'utf8');
         const title = f.replace('.md', '').replace(/[-_]/g, ' ');
         content += `\n-----\n# ${title}\n\n${text}\n`;
       }
     }
-    return { content, injectedSets };
+    return { content, injectedProfiles };
   }
 
-  private async injectSelections(selections: { setName: string; files: string[] }[]) {
+  private async injectSelections(selections: { profileName: string; files: string[] }[]) {
     if (!this.sourcePath) {
       this.showNotification('No source folder selected.');
       return;
@@ -254,28 +254,28 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       this.showNotification('No workspace open.');
       return;
     }
-    const { content, injectedSets } = this.buildCombinedInstructions(selections);
+    const { content, injectedProfiles } = this.buildCombinedInstructions(selections);
     if (!content) {
       this.showNotification('No instruction files selected for injection.');
       return;
     }
     fs.writeFileSync(out, content, 'utf8');
-    this.recordInjection(injectedSets.join(', '));
+    this.recordInjection(injectedProfiles.join(', '));
     if (this.view) {
       const p = this.readJson<GeneralState>(this.generalStatePath()!);
       this.view.webview.postMessage({
-        command: 'lastInjectedSetUpdate',
-        lastInjectedSet: p?.lastInjectedSet ?? 'None',
+        command: 'lastInjectedProfileUpdate',
+        lastInjectedProfile: p?.lastInjectedProfile ?? 'None',
       });
     }
     const doc = await vscode.workspace.openTextDocument(out);
     await vscode.window.showTextDocument(doc, { preview: false });
-    this.showNotification(`copilot-instructions.md updated from: ${injectedSets.join(', ')}`);
+    this.showNotification(`copilot-instructions.md updated from: ${injectedProfiles.join(', ')}`);
   }
 
-  private postInstructionFiles(setName: string) {
+  private postInstructionFiles(profileName: string) {
     if (!this.view) return;
-    const files = this.mdFilesInSet(setName);
+    const files = this.mdFilesInProfile(profileName);
     this.view.webview.postMessage({ command: 'instructionFiles', instructionFiles: files });
   }
 
@@ -285,7 +285,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     this.sourcePath = folders[0].fsPath;
     this.persistSourceFolder(this.sourcePath);
     this.clearCheckedState();
-    this.postSets();
+    this.postProfiles();
   }
 
   private async createSampleSource() {
@@ -310,7 +310,7 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
       this.sourcePath = sample;
       this.persistSourceFolder(sample);
       this.clearCheckedState();
-      this.postSets();
+      this.postProfiles();
       this.showNotification(`Sample source folder created at: ${sample}`);
       vscode.env.openExternal(vscode.Uri.file(sample));
     } catch {
@@ -318,27 +318,27 @@ class CopilotProfilesProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private postSets() {
+  private postProfiles() {
     if (!this.view) return;
-    const sets = this.listSets();
-    const setsPath = this.sourcePath && fs.existsSync(this.sourcePath) && sets.length ? this.sourcePath : '';
+    const profiles = this.listProfiles();
+    const profilesPath = this.sourcePath && fs.existsSync(this.sourcePath) && profiles.length ? this.sourcePath : '';
     const gen = this.readJson<GeneralState>(this.generalStatePath() || '') ?? undefined;
-    const lastInjectedSet = gen?.lastInjectedSet ?? 'None';
-    const lastInjectedSetName = gen?.lastInjectedSetName ?? '';
+    const lastInjectedProfile = gen?.lastInjectedProfile ?? 'None';
+    const lastInjectedProfileName = gen?.lastInjectedProfileName ?? '';
     const savedCheckedState = this.loadCheckedState();
     this.view.webview.postMessage({
-      command: 'sets',
-      sets,
-      setsPath,
-      lastInjectedSet,
-      lastInjectedSetName,
+      command: 'profiles',
+      profiles,
+      profilesPath,
+      lastInjectedProfile,
+      lastInjectedProfileName,
       savedCheckedState,
     });
   }
 
-  private async openInstructionFile(setName: string, fileName: string) {
+  private async openInstructionFile(profileName: string, fileName: string) {
     if (!this.sourcePath) return;
-    const filePath = path.join(this.sourcePath, setName, fileName);
+    const filePath = path.join(this.sourcePath, profileName, fileName);
     if (!fs.existsSync(filePath)) {
       vscode.window.showErrorMessage(`File not found: ${filePath}`);
       return;

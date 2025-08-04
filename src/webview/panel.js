@@ -1,9 +1,9 @@
 const vscode = acquireVsCodeApi();
 
 const state = {
-  sets: [],
+  profiles: [],
   sourcePath: '',
-  pages: [{ set: '', checkedFiles: [], instructionFiles: [] }],
+  pages: [{ profile: '', checkedFiles: [], instructionFiles: [] }],
   currentPage: 0,
 };
 
@@ -11,7 +11,7 @@ function restoreState(saved) {
   if (!saved) return;
   if (Array.isArray(saved.pages) && saved.pages.length) {
     state.pages = saved.pages.map((p) => ({
-      set: p.set || '',
+      profile: p.profile || '',
       checkedFiles: Array.isArray(p.checkedFiles) ? [...p.checkedFiles] : [],
       instructionFiles: Array.isArray(p.instructionFiles) ? [...p.instructionFiles] : [],
     }));
@@ -25,7 +25,7 @@ function persistState() {
     command: 'saveCheckedState',
     state: {
       pages: state.pages.map((p) => ({
-        set: p.set,
+        profile: p.profile,
         checkedFiles: p.checkedFiles,
         instructionFiles: p.instructionFiles,
       })),
@@ -34,15 +34,15 @@ function persistState() {
   });
 }
 
-function setDropdownChanged(e) {
+function profileDropdownChanged(e) {
   const value = e.target.value;
   const page = state.pages[state.currentPage];
-  page.set = value;
+  page.profile = value;
   page.checkedFiles = [];
   updateInjectEnabled();
   persistState();
-  if (page.set) {
-    vscode.postMessage({ command: 'getInstructionFiles', setName: page.set });
+  if (page.profile) {
+    vscode.postMessage({ command: 'getInstructionFiles', profileName: page.profile });
   } else {
     renderInstructionFiles([], []);
   }
@@ -50,10 +50,10 @@ function setDropdownChanged(e) {
 
 function injectClicked() {
   const selections = state.pages
-    .filter((p) => p.set && p.checkedFiles.length)
-    .map((p) => ({ setName: p.set, files: p.checkedFiles }));
+    .filter((p) => p.profile && p.checkedFiles.length)
+    .map((p) => ({ profileName: p.profile, files: p.checkedFiles }));
   if (!selections.length) return;
-  vscode.postMessage({ command: 'injectSets', selections });
+  vscode.postMessage({ command: 'injectProfiles', selections });
 }
 
 function prevPage() {
@@ -70,16 +70,16 @@ function nextPage() {
   persistState();
 }
 
-function addSet() {
-  const first = state.sets[0] || '';
-  state.pages.push({ set: first, checkedFiles: [], instructionFiles: [] });
+function addProfile() {
+  const first = state.profiles[0] || '';
+  state.pages.push({ profile: first, checkedFiles: [], instructionFiles: [] });
   state.currentPage = state.pages.length - 1;
   renderPage();
   persistState();
-  if (first) vscode.postMessage({ command: 'getInstructionFiles', setName: first });
+  if (first) vscode.postMessage({ command: 'getInstructionFiles', profileName: first });
 }
 
-function removeSet() {
+function removeProfile() {
   if (state.pages.length <= 1) return;
   state.pages.splice(state.currentPage, 1);
   if (state.currentPage > 0) state.currentPage--;
@@ -111,14 +111,14 @@ function applyInstructionFiles(files) {
 }
 
 function updateLastInjected(text) {
-  document.getElementById('lastInjectedSet').textContent = text || 'None';
+  document.getElementById('lastInjectedProfile').textContent = text || 'None';
 }
 
 function renderInstructionFiles(files, checked) {
   const container = document.getElementById('instructionFileList');
   container.innerHTML = '';
   if (!files.length) {
-    container.textContent = 'No instruction files found in this set.';
+    container.textContent = 'No instruction files found in this profile.';
     return;
   }
   files.forEach((f) => {
@@ -132,7 +132,7 @@ function renderInstructionFiles(files, checked) {
     name.textContent = f;
     name.style.cursor = 'pointer';
     name.style.flex = '1 1 auto';
-    name.onclick = () => vscode.postMessage({ command: 'openInstructionFile', setName: state.pages[state.currentPage].set, fileName: f });
+    name.onclick = () => vscode.postMessage({ command: 'openInstructionFile', profileName: state.pages[state.currentPage].profile, fileName: f });
 
     const box = document.createElement('input');
     box.type = 'checkbox';
@@ -157,25 +157,25 @@ function renderInstructionFiles(files, checked) {
 function updateInjectEnabled() {
   const hasFolder = !!state.sourcePath && state.sourcePath.trim() !== '' && state.sourcePath !== 'Not set';
   const page = state.pages[state.currentPage];
-  document.getElementById('injectBtn').disabled = !hasFolder || !page.set;
+  document.getElementById('injectBtn').disabled = !hasFolder || !page.profile;
 }
 
 function renderPage() {
-  const dropdown = document.getElementById('setDropdown');
+  const dropdown = document.getElementById('profileDropdown');
   dropdown.innerHTML = '';
-  state.sets.forEach((s) => {
+  state.profiles.forEach((s) => {
     const opt = document.createElement('option');
     opt.value = s;
     opt.textContent = s;
     dropdown.appendChild(opt);
   });
   const page = state.pages[state.currentPage];
-  if (!page.set && state.sets.length) page.set = state.sets[0];
-  dropdown.value = page.set || '';
+  if (!page.profile && state.profiles.length) page.profile = state.profiles[0];
+  dropdown.value = page.profile || '';
   const hasFolder = !!state.sourcePath && state.sourcePath.trim() !== '' && state.sourcePath !== 'Not set';
   dropdown.disabled = !hasFolder;
   updateInjectEnabled();
-  document.getElementById('removeSetBtn').disabled = state.pages.length <= 1;
+  document.getElementById('removeProfileBtn').disabled = state.pages.length <= 1;
   document.getElementById('prevPageBtn').disabled = state.currentPage === 0;
   document.getElementById('nextPageBtn').disabled = state.currentPage === state.pages.length - 1;
   document.getElementById('pageIndicator').textContent = `Page ${state.currentPage + 1} of ${state.pages.length}`;
@@ -186,8 +186,8 @@ function renderPage() {
   } else {
     sourceFolderElement.style.display = 'none';
   }
-  if (page.set) {
-    vscode.postMessage({ command: 'getInstructionFiles', setName: page.set });
+  if (page.profile) {
+    vscode.postMessage({ command: 'getInstructionFiles', profileName: page.profile });
   } else {
     renderInstructionFiles([], []);
   }
@@ -202,40 +202,40 @@ function openSourceFolderClick(e) {
 function init() {
   document.getElementById('browseBtn').onclick = browseSource;
   document.getElementById('createSampleBtn').onclick = createSample;
-  document.getElementById('setDropdown').onchange = setDropdownChanged;
+  document.getElementById('profileDropdown').onchange = profileDropdownChanged;
   document.getElementById('injectBtn').onclick = injectClicked;
   document.getElementById('prevPageBtn').onclick = prevPage;
   document.getElementById('nextPageBtn').onclick = nextPage;
-  document.getElementById('addSetBtn').onclick = addSet;
-  document.getElementById('removeSetBtn').onclick = removeSet;
+  document.getElementById('addProfileBtn').onclick = addProfile;
+  document.getElementById('removeProfileBtn').onclick = removeProfile;
   document.getElementById('sourceFolder').onclick = openSourceFolderClick;
-  vscode.postMessage({ command: 'getSets' });
+  vscode.postMessage({ command: 'getProfiles' });
 }
 
 window.onload = init;
 
 window.addEventListener('message', (event) => {
-  const { command, sets, setsPath, lastInjectedSet, instructionFiles, savedCheckedState } = event.data || {};
-  if (command === 'sets') {
-    state.sets = sets || [];
-    state.sourcePath = setsPath || '';
+  const { command, profiles, profilesPath, lastInjectedProfile, instructionFiles, savedCheckedState } = event.data || {};
+  if (command === 'profiles') {
+    state.profiles = profiles || [];
+    state.sourcePath = profilesPath || '';
     if (savedCheckedState) {
       restoreState(savedCheckedState);
     } else {
-      state.pages = [{ set: state.sets[0] || '', checkedFiles: [], instructionFiles: [] }];
+      state.pages = [{ profile: state.profiles[0] || '', checkedFiles: [], instructionFiles: [] }];
       state.currentPage = 0;
     }
     renderPage();
-    const isNotSet = !state.sourcePath || state.sourcePath.trim() === '' || state.sets.length === 0;
+    const isNotSet = !state.sourcePath || state.sourcePath.trim() === '' || state.profiles.length === 0;
     document.getElementById('sourceFolder').textContent = isNotSet ? 'Not set' : state.sourcePath;
-    updateLastInjected(lastInjectedSet);
+    updateLastInjected(lastInjectedProfile);
     const createBtn = document.getElementById('createSampleBtn');
     createBtn.style.display = isNotSet ? 'block' : 'none';
     if (isNotSet && justBrowsedSource) {
-      vscode.postMessage({ command: 'showNotification', message: 'No valid Sets found in this Source location.' });
+      vscode.postMessage({ command: 'showNotification', message: 'No valid Profiles found in this Source location.' });
       justBrowsedSource = false;
     }
   }
   if (command === 'instructionFiles') applyInstructionFiles(instructionFiles);
-  if (command === 'lastInjectedSetUpdate') updateLastInjected(lastInjectedSet);
+  if (command === 'lastInjectedProfileUpdate') updateLastInjected(lastInjectedProfile);
 });
