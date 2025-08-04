@@ -3,7 +3,7 @@
   "displayName": "Modular Copilot Profiles",
   "icon": "media/logo.png",
   "description": "Easily manage and switch GitHub Copilot instructions using modular profiles.",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "publisher": "alycse",
   "engines": {
     "vscode": "^1.102.0"
